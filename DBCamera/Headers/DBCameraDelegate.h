@@ -5,6 +5,7 @@
 //  Created by iBo on 05/02/14.
 //  Copyright (c) 2014 PSSD - Daniele Bogo. All rights reserved.
 //
+#import <Photos/Photos.h>
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
@@ -143,6 +144,7 @@
  *  @param URL            The NSURL of the Asset
  */
 - (void) collectionView:(UICollectionView *)collectionView itemURL:(NSURL *)URL;
+- (void) collectionView:(UICollectionView *)collectionView asset:(PHAsset *)asset;
 @end
 
 /**

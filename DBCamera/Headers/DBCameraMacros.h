@@ -18,4 +18,14 @@
  */
 #define IS_RETINA_4 ( [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2 && [[UIScreen mainScreen] bounds].size.height > 480)
 
+
+#ifndef CGFLOAT_CEIL
+#ifdef CGFLOAT_IS_DOUBLE
+#define CGFLOAT_CEIL(value) ceil(value)
+#else
+#define CGFLOAT_CEIL(value) ceilf(value)
+#endif
+#endif
+
+#define kAspectRatio (9.0f/11.0f)
 #endif

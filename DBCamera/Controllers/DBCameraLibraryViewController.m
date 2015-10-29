@@ -64,7 +64,6 @@
         _containersMapping = [NSMutableDictionary dictionary];
         _items = [NSMutableArray array];
         _libraryMaxImageSize = 1900;
-        
         [self setTintColor:[UIColor whiteColor]];
     }
     return self;
@@ -92,7 +91,8 @@
 
     [self.view addSubview:self.loading];
     [self.view setGestureRecognizers:_pageViewController.gestureRecognizers];
-	
+    _titleLabel.text = @"ALL PHOTOS";
+
 	[self loadLibraryGroups];
 }
 
@@ -146,68 +146,38 @@
 
 - (void) loadLibraryGroups
 {
-    if ( _isEnumeratingGroups )
-        return;
-    
-    __weak NSMutableArray *blockItems = _items;
-    __weak NSMutableDictionary *blockContainerMapping = _containersMapping;
-    __weak typeof(self) blockSelf = self;
-    __weak UIPageViewController *pageViewControllerBlock = _pageViewController;
 
-    __block NSUInteger blockPresentationIndex = _presentationIndex;
-    __block BOOL isEnumeratingGroupsBlock = _isEnumeratingGroups;
-    isEnumeratingGroupsBlock = YES;
-
-    [[DBLibraryManager sharedInstance] loadGroupsAssetWithBlock:^(BOOL success, NSArray *items) {
-        if (!blockSelf) {
-            return;
-        }
-
-        if (success) {
-            [blockSelf.loading removeFromSuperview];
-
-            if (items.count > 0) {
-                [blockItems removeAllObjects];
-                [blockItems addObjectsFromArray:items];
-                [blockContainerMapping removeAllObjects];
-
-                for (NSUInteger i = 0; i < blockItems.count; i++) {
-                    DBCameraCollectionViewController *vc = [[DBCameraCollectionViewController alloc] initWithCollectionIdentifier:kItemIdentifier];
-                    [vc setCurrentIndex:i];
-                    [vc setItems:(NSArray *) blockItems[i][@"groupAssets"]];
-                    [vc setCollectionControllerDelegate:blockSelf];
-
-                    blockContainerMapping[@(i)] = vc;
-                }
-
-                NSInteger usedIndex = [blockSelf indexForSelectedItem];
-                blockPresentationIndex = (NSUInteger) (usedIndex >= 0 ? usedIndex : 0);
-
-                [blockSelf setNavigationTitleAtIndex:blockPresentationIndex];
-                [blockSelf setSelectedItemID:blockItems[blockPresentationIndex][@"propertyID"]];
-
-                [pageViewControllerBlock setViewControllers:@[blockContainerMapping[@(blockPresentationIndex)]]
-                                                  direction:UIPageViewControllerNavigationDirectionForward
-                                                   animated:NO
-                                                 completion:nil];
-
-                [UIView animateWithDuration:.3 animations:^{
-                    [pageViewControllerBlock.view setAlpha:1];
-                }];
-            } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title")
-                                                message:DBCameraLocalizedStrings(@"pickerimage.nophoto")
-                                               delegate:nil
-                                      cancelButtonTitle:@"Ok"
-                                      otherButtonTitles:nil, nil] show];
-                });
-            }
-        }
-
-        isEnumeratingGroupsBlock = NO;
+    PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:nil];
+    _items = [@[] mutableCopy];
+    [result enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSLog(@"%@", obj);
+        [_items addObject:obj];
     }];
+    [self loadPhotos:_items];
 }
+
+- (void)loadPhotos:(NSMutableArray*)items {
+    [self.loading removeFromSuperview];
+    
+    if (items.count > 0) {
+        DBCameraCollectionViewController *vc = [[DBCameraCollectionViewController alloc] initWithCollectionIdentifier:kItemIdentifier];
+        [vc setItems:items];
+        [vc setCollectionControllerDelegate:self];
+        [self addChildViewController:vc];
+        [self.view addSubview:vc.view];
+        [vc didMoveToParentViewController:self];
+        [vc.view setFrame:(CGRect){ 0, CGRectGetMaxY(_topContainerBar.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - ( CGRectGetHeight(_topContainerBar.frame) + CGRectGetHeight(_bottomContainerBar.frame) ) }];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title")
+                                        message:DBCameraLocalizedStrings(@"pickerimage.nophoto")
+                                       delegate:nil
+                              cancelButtonTitle:@"Ok"
+                              otherButtonTitles:nil, nil] show];
+        });
+    }
+}
+
 
 - (void) setNavigationTitleAtIndex:(NSUInteger)index
 {
@@ -358,11 +328,54 @@
             UIImage *image = [UIImage imageForAsset:asset maxPixelSize:_libraryMaxImageSize];
 //            UIImage *image = [self test:asset];
             
+            [self extractEXIF: URL
+                     complete:^(NSDictionary *exif, NSError *err){
+                         NSDictionary *gpsInfo = [exif objectForKey:@"{GPS}"];
+                         if (gpsInfo)
+                             [metadata setObject:gpsInfo forKey:@"{GPS}"];
+                         if ( !weakSelf.useCameraSegue ) {
+                             if ( [weakSelf.delegate respondsToSelector:@selector(camera:didFinishWithImage:withMetadata:)] )
+                                 [weakSelf.delegate camera:self didFinishWithImage:image withMetadata:metadata];
+                         } else {
+                             DBCameraSegueViewController *segue = [[DBCameraSegueViewController alloc] initWithImage:image thumb:[UIImage imageWithCGImage:[asset aspectRatioThumbnail]]];
+                             [segue setTintColor:self.tintColor];
+                             [segue setSelectedTintColor:self.selectedTintColor];
+                             [segue setForceQuadCrop:_forceQuadCrop];
+                             [segue enableGestures:YES];
+                             [segue setCapturedImageMetadata:metadata];
+                             [segue setDelegate:weakSelf.delegate];
+                             [segue setCameraSegueConfigureBlock:self.cameraSegueConfigureBlock];
+                             
+                             [weakSelf.navigationController pushViewController:segue animated:YES];
+                         }
+                     }];
+
+
+            
+            [weakSelf.loading removeFromSuperview];
+        } failureBlock:nil];
+    });
+}
+
+- (void) collectionView:(UICollectionView *)collectionView asset:(PHAsset *)asset
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.view addSubview:self.loading];
+        
+        __weak typeof(self) weakSelf = self;
+        PHContentEditingInputRequestOptions *editOptions = [[PHContentEditingInputRequestOptions alloc]init];
+        editOptions.networkAccessAllowed = YES;
+        
+        [asset requestContentEditingInputWithOptions:editOptions completionHandler:^(PHContentEditingInput *contentEditingInput, NSDictionary *info) {
+            CIImage *ciImage = [CIImage imageWithContentsOfURL:contentEditingInput.fullSizeImageURL];
+            UIImage *image = contentEditingInput.displaySizeImage;
+            NSMutableDictionary *metadata = [ciImage.properties mutableCopy];
+
             if ( !weakSelf.useCameraSegue ) {
                 if ( [weakSelf.delegate respondsToSelector:@selector(camera:didFinishWithImage:withMetadata:)] )
                     [weakSelf.delegate camera:self didFinishWithImage:image withMetadata:metadata];
             } else {
-                DBCameraSegueViewController *segue = [[DBCameraSegueViewController alloc] initWithImage:image thumb:[UIImage imageWithCGImage:[asset aspectRatioThumbnail]]];
+                DBCameraSegueViewController *segue = [[DBCameraSegueViewController alloc] initWithImage:image thumb:image];
                 [segue setTintColor:self.tintColor];
                 [segue setSelectedTintColor:self.selectedTintColor];
                 [segue setForceQuadCrop:_forceQuadCrop];
@@ -373,10 +386,31 @@
                 
                 [weakSelf.navigationController pushViewController:segue animated:YES];
             }
-            
             [weakSelf.loading removeFromSuperview];
-        } failureBlock:nil];
+        }];
+
+        
     });
+}
+
+
+-(void)extractEXIF:(NSURL*)imageUrl complete:(ExtractEXIFComplete)complete{
+    ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *asset)
+    {
+        //if (asset.originalAsset) asset = asset.originalAsset;
+        NSDictionary *metadata = (NSDictionary*)[[asset defaultRepresentation] metadata];
+        complete(metadata, nil);
+    };
+    
+    ALAssetsLibraryAccessFailureBlock failureblock  = ^(NSError *myerror)
+    {
+        complete(nil, myerror);
+    };
+    
+    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+    [assetslibrary assetForURL:imageUrl
+                   resultBlock:resultblock
+                  failureBlock:failureblock];
 }
 
 //- (UIImage *) test:(ALAsset *)asset

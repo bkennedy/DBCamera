@@ -15,10 +15,14 @@
 #import "UIImage+TintColor.h"
 #import "UIImage+Bundle.h"
 #import "GrayscaleContrastFilter.h"
+#import "DBCameraMacros.h"
 
 #import <GPUImage/GPUImage.h>
 
 #define kFilterCellIdentifier @"filterCell"
+
+#define kDeviceScreenWidth ([[UIScreen mainScreen] bounds].size.width)
+#define kDeviceScreenHeight ([[UIScreen mainScreen] bounds].size.height)
 
 #ifndef DBCameraLocalizedStrings
 #define DBCameraLocalizedStrings(key) \
@@ -86,7 +90,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
         
         [self setSourceImage:image];
         [self setPreviewImage:thumb];
-        [self setCropRect:(CGRect){ 0, 320 }];
+        [self setCropRect:(CGRect){ 0, 320 * kAspectRatio }];
         [self setMinimumScale:.2];
         [self setMaximumScale:10];
         [self createInterface];
@@ -116,10 +120,14 @@ static const CGSize kFilterCellSize = { 75, 90 };
     
     [self.view setUserInteractionEnabled:YES];
     [self.view setBackgroundColor:[UIColor blackColor]];
+
+
+    CGFloat scaleFactor = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? 2.0f : 1.0f;
     
-    CGFloat cropX = ( CGRectGetWidth( self.frameView.frame) - 320 ) * .5;
-    _pFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - 360 ) * .5, 320, 320 };
-    _lFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - 240) * .5, 320, 240 };
+    CGFloat cropX = ( CGRectGetWidth( self.frameView.frame) - (320 * scaleFactor)) * .5;
+    
+    _pFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (360 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((320 * scaleFactor) * kAspectRatio) };
+    _lFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (240 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((240 * scaleFactor) * kAspectRatio) };
     
     [self setCropRect:self.previewImage.size.width > self.previewImage.size.height ? _lFrame : _pFrame];
     
@@ -208,7 +216,8 @@ static const CGSize kFilterCellSize = { 75, 90 };
             UIImage *transform =  [UIImage imageWithCGImage:resultRef scale:1.0 orientation:UIImageOrientationUp];
             CGImageRelease(resultRef);
             transform = [_filterMapping[@(_selectedFilterIndex.row)] imageByFilteringImage:transform];
-            [_delegate camera:self didFinishWithImage:transform withMetadata:self.capturedImageMetadata];
+            NSDictionary *gpsDict = [self.capturedImageMetadata objectForKey:@"{GPS}"];
+            [_delegate camera:self didFinishWithImage:transform withMetadata:gpsDict];
         });
     });
 }

@@ -5,7 +5,7 @@
 //  Created by iBo on 08/04/14.
 //  Copyright (c) 2014 PSSD - Daniele Bogo. All rights reserved.
 //
-
+#import <Photos/Photos.h>
 #import "DBCameraCollectionViewController.h"
 #import "DBCollectionViewFlowLayout.h"
 #import "DBCollectionViewCell.h"
@@ -70,14 +70,16 @@
     DBCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:_collectionIdentifier forIndexPath:indexPath];
     [item.itemImage setImage:nil];
     
-    if ( _items.count > 0) {
-        __weak DBCollectionViewCell *blockItem = item;
-        [[[DBLibraryManager sharedInstance] defaultAssetsLibrary] assetForURL:(NSURL *)_items[indexPath.item]  resultBlock:^(ALAsset *asset) {
-            UIImage *image = [UIImage imageWithCGImage:[asset thumbnail]];
-            [blockItem.itemImage setImage:image];
-        } failureBlock:nil];
-    }
-    
+    PHAsset *object = self.items[indexPath.row];
+    [[PHImageManager defaultManager] requestImageForAsset:(PHAsset *)object
+                                               targetSize:CGSizeMake(item.itemImage.frame.size.width, item.itemImage.frame.size.height)
+                                              contentMode:PHImageContentModeDefault
+                                                  options:nil
+                                            resultHandler:^(UIImage *result, NSDictionary *info) {
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    [item.itemImage setImage:result];
+                                                });
+                                            }];
     return item;
 }
 
@@ -90,7 +92,7 @@
 
 - (void) collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    [_collectionControllerDelegate collectionView:collectionView itemURL:(NSURL *)_items[indexPath.item]];
+    [_collectionControllerDelegate collectionView:collectionView asset:(PHAsset *)_items[indexPath.item]];
 }
 
 @end

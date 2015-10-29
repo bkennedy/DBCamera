@@ -5,7 +5,6 @@
 //  Created by iBo on 06/03/14.
 //  Copyright (c) 2014 PSSD - Daniele Bogo. All rights reserved.
 //
-
 #import <UIKit/UIKit.h>
 #import "DBCameraDelegate.h"
 
@@ -38,4 +37,7 @@
  *  @return A DBCameraLibraryViewController
  */
 - (id) initWithDelegate:(id<DBCameraContainerDelegate>)delegate;
+
+typedef void (^ExtractEXIFComplete)(NSDictionary *exif, NSError *err);
+
 @end
