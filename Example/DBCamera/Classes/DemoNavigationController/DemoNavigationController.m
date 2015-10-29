@@ -20,7 +20,7 @@
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     if (self.topViewController.presentedViewController) {
         return self.topViewController.presentedViewController.supportedInterfaceOrientations;
     }

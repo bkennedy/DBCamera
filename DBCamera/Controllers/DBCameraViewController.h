@@ -5,7 +5,7 @@
 //  Created by iBo on 31/01/14.
 //  Copyright (c) 2014 PSSD - Daniele Bogo. All rights reserved.
 //
-
+#import <CoreMotion/CoreMotion.h>
 #import <UIKit/UIKit.h>
 #import "DBCameraDelegate.h"
 #import "UIViewController+UIViewController_FullScreen.h"
@@ -18,7 +18,9 @@
 /**
  *  DBCameraViewController
  */
-@interface DBCameraViewController : UIViewController <DBCameraSegueSettings, DBCameraViewControllerSettings>
+@interface DBCameraViewController : UIViewController <DBCameraSegueSettings, DBCameraViewControllerSettings> {
+    BOOL _processingPhoto;
+}
 /**
  *  An id object compliant with the DBCameraViewControllerDelegate
  */
@@ -84,4 +86,9 @@
  *  @return A DBCameraViewController
  */
 - (instancetype) initWithDelegate:(id<DBCameraViewControllerDelegate>)delegate cameraView:(id)camera;
+
+@property (nonatomic, strong) NSMutableArray *pinnedViews;
+@property (nonatomic, strong) CMMotionManager *motionManager;
+@property (nonatomic, assign) UIInterfaceOrientation orientationLast, orientationAfterProcess;
+
 @end

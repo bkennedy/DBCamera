@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-
+#import "VolumeListener.h"
 #import "DBCameraDelegate.h"
 
 /**
@@ -93,8 +93,11 @@
 /**
  *  The pinch gesture recognizes the pinch to zoom action
  */
-@property (nonatomic, strong) UIPinchGestureRecognizer *pinch;
+@property (nonatomic, strong)   UIPinchGestureRecognizer *pinch;
+@property (nonatomic,assign)    BOOL panning;
 
+@property (nonatomic,assign)    UIDeviceOrientation deviceOrientation;
+@property (nonatomic,strong) VolumeListener *volumeListener;
 /**
  *  Class method to create the view with a frame
  *
@@ -149,4 +152,5 @@
  *  @param scale The scale value
  */
 - (void) pinchCameraViewWithScalNum:(CGFloat)scale;
+
 @end

@@ -46,6 +46,9 @@
  */
 - (void) switchCamera;
 
+// Tells whether or not you have a flash
+-(BOOL) hasFlash;
+ 
 /**
  *  Tells the delegate the status of the flash
  *

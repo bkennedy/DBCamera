@@ -17,10 +17,12 @@
 #import "DBMotionManager.h"
 
 #import "UIImage+Crop.h"
+#import "UIViewController+Camera.h"
 #import "DBCameraMacros.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+
 
 #ifndef DBCameraLocalizedStrings
 #define DBCameraLocalizedStrings(key) \
@@ -28,7 +30,6 @@
 #endif
 
 @interface DBCameraViewController () <DBCameraManagerDelegate, DBCameraViewDelegate> {
-    BOOL _processingPhoto;
     UIDeviceOrientation _deviceOrientation;
     BOOL wasStatusBarHidden;
     BOOL wasWantsFullScreenLayout;
@@ -111,6 +112,14 @@
         [(DBCameraView *)camera cameraButton].enabled = [self.cameraManager hasMultipleCameras];
         [self.cameraManager hasMultipleCameras];
     }
+    
+    self.pinnedViews = [NSMutableArray array];
+    [self.pinnedViews addObject:self.cameraView.triggerButton];
+    [self.pinnedViews addObject:self.cameraView.cameraButton];
+    [self.pinnedViews addObject:self.cameraView.flashButton];
+    [self.pinnedViews addObject:self.cameraView.gridButton];
+    [self.pinnedViews addObject:self.cameraView.photoLibraryButton];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -128,6 +137,8 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self initializeMotionManager];
+
     if ( !self.customCamera )
         [self checkForLibraryImage];
 }
@@ -135,6 +146,7 @@
 - (void) viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    [self.motionManager stopAccelerometerUpdates];
     [self.cameraManager performSelector:@selector(stopRunning) withObject:nil afterDelay:0.0];
 }
 
@@ -144,7 +156,7 @@
     _cameraManager = nil;
 }
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
 
@@ -234,6 +246,7 @@
          orientation != UIDeviceOrientationFaceUp ||
          orientation != UIDeviceOrientationFaceDown ) {
         _deviceOrientation = orientation;
+        self.cameraView.deviceOrientation = _deviceOrientation;
     }
 }
 
@@ -246,28 +259,14 @@
 }
 
 + (AVCaptureVideoOrientation)interfaceOrientationToVideoOrientation:(UIInterfaceOrientation)orientation {
-    AVCaptureVideoOrientation videoOrientation = AVCaptureVideoOrientationPortrait;
-    switch (orientation) {
-        case UIInterfaceOrientationPortraitUpsideDown:
-            videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
-            break;
-        case UIInterfaceOrientationLandscapeLeft:
-            videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            videoOrientation = AVCaptureVideoOrientationLandscapeRight;
-            break;
-        default:
-            break;
-    }
-    return videoOrientation;
+    return AVCaptureVideoOrientationPortrait;
 }
 
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
     
-    AVCaptureVideoOrientation videoOrientation = [[self class] interfaceOrientationToVideoOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
+    AVCaptureVideoOrientation videoOrientation = AVCaptureVideoOrientationPortrait;
     DBCameraView *camera = _customCamera ?: _cameraView;
     if (camera.previewLayer.connection.supportsVideoOrientation
         && camera.previewLayer.connection.videoOrientation != videoOrientation) {
@@ -446,5 +445,54 @@
     if ( modalViewController )
         [self dismissCamera];
 }
+
+#pragma mark - Button Rotation
+- (void)initializeMotionManager{
+    _motionManager = [[CMMotionManager alloc] init];
+    _motionManager.accelerometerUpdateInterval = .2;
+    _motionManager.gyroUpdateInterval = .2;
+    
+    [self.motionManager startAccelerometerUpdatesToQueue:[NSOperationQueue currentQueue]
+                                             withHandler:^(CMAccelerometerData  *accelerometerData, NSError *error) {
+                                                 if (!error) {
+                                                     [self outputAccelertionData:accelerometerData.acceleration];
+                                                 }
+                                                 else{
+                                                     NSLog(@"%@", error);
+                                                 }
+                                             }];
+}
+
+- (void)outputAccelertionData:(CMAcceleration)acceleration{
+    UIInterfaceOrientation orientationNew;
+    
+    if (acceleration.x >= 0.75) {
+        orientationNew = UIInterfaceOrientationLandscapeLeft;
+    }
+    else if (acceleration.x <= -0.75) {
+        orientationNew = UIInterfaceOrientationLandscapeRight;
+    }
+    else if (acceleration.y <= -0.75) {
+        orientationNew = UIInterfaceOrientationPortrait;
+    }
+    else if (acceleration.y >= 0.75) {
+        orientationNew = UIInterfaceOrientationPortraitUpsideDown;
+    }
+    else {
+        // Consider same as last time
+        return;
+    }
+    
+    if (orientationNew == self.orientationLast)
+        return;
+    
+    self.orientationLast = orientationNew;
+    [self orientationChanged:orientationNew];
+}
+
+-(void)orientationChanged:(UIInterfaceOrientation)toInterfaceOrientation {
+    [UIViewController rotatePinnedViews:self.pinnedViews forOrientation:toInterfaceOrientation];
+}
+
 
 @end

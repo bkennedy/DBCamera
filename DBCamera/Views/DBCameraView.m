@@ -16,9 +16,13 @@
 
 #define previewFrame (CGRect){ 0, 65, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
 
+#define kDefaultFlashSetting @"kDefaultFlashSetting"
+
 // pinch
 #define MAX_PINCH_SCALE_NUM   3.f
 #define MIN_PINCH_SCALE_NUM   1.f
+
+#define kCameraButtonSize   40
 
 @implementation DBCameraView{
     CGFloat preScaleNum;
@@ -36,6 +40,10 @@
 + (DBCameraView *) initWithCaptureSession:(AVCaptureSession *)captureSession
 {
     return [[self alloc] initWithFrame:[[UIScreen mainScreen] bounds] captureSession:captureSession];
+}
+
+-(void)dealloc {
+    [self volumeButtonListeners:NO];
 }
 
 - (id) initWithFrame:(CGRect)frame captureSession:(AVCaptureSession *)captureSession
@@ -63,6 +71,8 @@
 
         self.tintColor = [UIColor whiteColor];
         self.selectedTintColor = [UIColor redColor];
+        scaleNum = 1;
+        [self volumeButtonListeners:YES];
     }
 
     return self;
@@ -90,7 +100,6 @@
     [self.bottomContainerBar addSubview:self.triggerButton];
     [self.bottomContainerBar addSubview:self.closeButton];
     [self.bottomContainerBar addSubview:self.photoLibraryButton];
-
     [self createGesture];
 }
 
@@ -158,7 +167,7 @@
         _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_closeButton setBackgroundColor:[UIColor clearColor]];
         [_closeButton setImage:[[UIImage imageInBundleNamed:@"close"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
-        [_closeButton setFrame:(CGRect){ 25,  CGRectGetMidY(self.bottomContainerBar.bounds) - 15, 30, 30 }];
+        [_closeButton setFrame:(CGRect){ 25,  CGRectGetMidY(self.bottomContainerBar.bounds) - 15, kCameraButtonSize, kCameraButtonSize }];
         [_closeButton addTarget:self action:@selector(close) forControlEvents:UIControlEventTouchUpInside];
     }
 
@@ -172,7 +181,7 @@
         [_cameraButton setBackgroundColor:[UIColor clearColor]];
         [_cameraButton setImage:[[UIImage imageInBundleNamed:@"flip"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_cameraButton setImage:[[UIImage imageInBundleNamed:@"flip"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
-        [_cameraButton setFrame:(CGRect){ 25, 17.5f, 30, 30 }];
+        [_cameraButton setFrame:(CGRect){ 25, 17.5f, kCameraButtonSize, kCameraButtonSize }];
         [_cameraButton addTarget:self action:@selector(changeCamera:) forControlEvents:UIControlEventTouchUpInside];
     }
 
@@ -181,16 +190,18 @@
 
 - (UIButton *) flashButton
 {
+    NSInteger mode = [[[NSUserDefaults standardUserDefaults] objectForKey:kDefaultFlashSetting] integerValue];
     if ( !_flashButton ) {
         _flashButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_flashButton setBackgroundColor:[UIColor clearColor]];
         [_flashButton setImage:[[UIImage imageInBundleNamed:@"flash"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_flashButton setImage:[[UIImage imageInBundleNamed:@"flash"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
-        [_flashButton setFrame:(CGRect){ CGRectGetWidth(self.bounds) - 55, 17.5f, 30, 30 }];
+        [_flashButton setFrame:(CGRect){ CGRectGetWidth(self.bounds) - 55, 17.5f, kCameraButtonSize, kCameraButtonSize }];
         [_flashButton setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin];
         [_flashButton addTarget:self action:@selector(flashTriggerAction:) forControlEvents:UIControlEventTouchUpInside];
     }
-
+    [self setFlashButtonSetting:mode];
+    
     return _flashButton;
 }
 
@@ -201,7 +212,7 @@
         [_gridButton setBackgroundColor:[UIColor clearColor]];
         [_gridButton setImage:[[UIImage imageInBundleNamed:@"cameraGrid"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_gridButton setImage:[[UIImage imageInBundleNamed:@"cameraGrid"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
-        [_gridButton setFrame:(CGRect){ 0, 0, 30, 30 }];
+        [_gridButton setFrame:(CGRect){ 0, 0, kCameraButtonSize, kCameraButtonSize }];
         [_gridButton setCenter:(CGPoint){ CGRectGetMidX(self.topContainerBar.bounds), CGRectGetMidY(self.topContainerBar.bounds) }];
         [_gridButton setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin];
         [_gridButton addTarget:self action:@selector(addGridToCameraAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -305,6 +316,7 @@
     [_panGestureRecognizer setMaximumNumberOfTouches:1];
     [_panGestureRecognizer setDelegate:self];
     [self addGestureRecognizer:_panGestureRecognizer];
+    preScaleNum = 1;
 }
 
 #pragma mark - Actions
@@ -327,8 +339,35 @@
 {
     if ( [_delegate respondsToSelector:@selector(triggerFlashForMode:)] ) {
         [button setSelected:!button.isSelected];
-        [_delegate triggerFlashForMode: button.isSelected ? AVCaptureFlashModeOn : AVCaptureFlashModeOff ];
+        if (button.tag == AVCaptureFlashModeOff)
+            button.tag = AVCaptureFlashModeOn;
+        else if (button.tag == AVCaptureFlashModeOn)
+            button.tag = AVCaptureFlashModeAuto;
+        else if (button.tag == AVCaptureFlashModeAuto)
+            button.tag = AVCaptureFlashModeOff;
+        
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:button.tag] forKey:kDefaultFlashSetting];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self setFlashButtonSetting:button.tag];
+        
     }
+}
+
+- (void)setFlashButtonSetting:(NSInteger)mode {
+    
+    if (mode == AVCaptureFlashModeOn) {
+        [_flashButton setImage:[UIImage imageNamed:@"flash_on"]  forState:UIControlStateNormal];
+        [_flashButton setImage:[UIImage imageNamed:@"flash_on"] forState:UIControlStateSelected];
+    } else if (mode == AVCaptureFlashModeAuto) {
+        [_flashButton setImage:[UIImage imageNamed:@"flash_auto_on"]  forState:UIControlStateNormal];
+        [_flashButton setImage:[UIImage imageNamed:@"flash_auto_on"] forState:UIControlStateSelected];
+    }else {
+        [_flashButton setImage:[UIImage imageNamed:@"flash"] forState:UIControlStateNormal];
+        [_flashButton setImage:[UIImage imageNamed:@"flash"] forState:UIControlStateSelected];
+    }
+    _flashButton.tag = mode;
+    [_delegate triggerFlashForMode: mode];
+
 }
 
 - (void) changeCamera:(UIButton *)button
@@ -371,6 +410,37 @@
     }
 }
 
+- (CGFloat)scale:(UIPanGestureRecognizer *)recognizer{
+    CGPoint translation = [recognizer translationInView:recognizer.view];
+    CGFloat width;
+    
+    if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) {
+        width = recognizer.view.bounds.size.height;
+    } else {
+        width = recognizer.view.bounds.size.width;
+    }
+    
+    switch (self.deviceOrientation) {
+        case UIDeviceOrientationPortrait:
+            return translation.x/width;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            return (translation.x * -1)/width;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            return translation.y/width;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            return translation.y * -1/width;
+            break;
+        case UIDeviceOrientationFaceUp:
+        case UIDeviceOrientationFaceDown:
+        default:
+            break; // leave the layer in its last known orientation
+    }
+    return 0.0f;
+}
+
 - (void) hanldePanGestureRecognizer:(UIPanGestureRecognizer *)panGestureRecognizer
 {
     BOOL hasFocus = YES;
@@ -381,20 +451,55 @@
         return;
 
     UIGestureRecognizerState state = panGestureRecognizer.state;
-    CGPoint touchPoint = [panGestureRecognizer locationInView:self];
-    [self draw:_focusBox atPointOfInterest:(CGPoint){ touchPoint.x, touchPoint.y - CGRectGetMinY(_previewLayer.frame) } andRemove:YES];
+//    CGPoint touchPoint = [panGestureRecognizer locationInView:self];
+//    [self draw:_focusBox atPointOfInterest:(CGPoint){ touchPoint.x, touchPoint.y - CGRectGetMinY(_previewLayer.frame) } andRemove:YES];
 
     switch (state) {
-        case UIGestureRecognizerStateBegan:
-
-            break;
-        case UIGestureRecognizerStateChanged: {
+        case UIGestureRecognizerStateBegan:{
+            preScaleNum = scaleNum;
+            self.panning = NO;
             break;
         }
+        case UIGestureRecognizerStateChanged:  {
+            self.panning = YES;
+            CGFloat percentage = [self scale:panGestureRecognizer];
+            
+            BOOL allTouchesAreOnThePreviewLayer = YES;
+            NSUInteger numTouches = [panGestureRecognizer numberOfTouches], i;
+            for ( i = 0; i < numTouches; ++i ) {
+                CGPoint location = [panGestureRecognizer locationOfTouch:i inView:self];
+                CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:_previewLayer.superlayer];
+                if ( ! [_previewLayer containsPoint:convertedLocation] ) {
+                    allTouchesAreOnThePreviewLayer = NO;
+                    break;
+                }
+            }
+            
+            if ( allTouchesAreOnThePreviewLayer ) {
+                scaleNum = preScaleNum * (1+percentage);// ((direction == kUISwipeDirectionRight) ? 1 : -1);
+                if (scaleNum < MIN_PINCH_SCALE_NUM)
+                    scaleNum = MIN_PINCH_SCALE_NUM;
+                if (scaleNum > MAX_PINCH_SCALE_NUM)
+                    scaleNum = MAX_PINCH_SCALE_NUM;
+                
+                if ( [self.delegate respondsToSelector:@selector(cameraCaptureScale:)] )
+                    [self.delegate cameraCaptureScale:scaleNum];
+
+                [CATransaction begin];
+                [CATransaction setAnimationDuration:.025];
+                [_previewLayer setAffineTransform:CGAffineTransformMakeScale(scaleNum, scaleNum)];
+                [CATransaction commit];
+            }
+            
+            break;
+        }
+
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateEnded: {
-            [self tapToFocus:panGestureRecognizer];
+            if (!self.panning)
+                [self tapToFocus:panGestureRecognizer];
+            self.panning = NO;
             break;
         }
         default:
@@ -461,5 +566,37 @@
         [CATransaction commit];
     }
 }
+
+- (void) volumeButtonListeners:(BOOL)start
+{
+    if(start){
+        _volumeListener = [[VolumeListener alloc] init];
+        [[self viewWithTag:54870149] removeFromSuperview];
+        [self addSubview: [_volumeListener dummyVolume]];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+    }
+    else{
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+        [[self viewWithTag:54870149] removeFromSuperview];
+    }
+}
+
+- (void)volumeChanged:(NSNotification *)notification{
+    if(_volumeListener.runningVolumeNotification==FALSE){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _volumeListener.runningVolumeNotification = TRUE;
+            MPMusicPlayerController *musicPlayer = [MPMusicPlayerController iPodMusicPlayer];
+            [musicPlayer setVolume:_volumeListener.systemVolume];
+            
+            // do what you want to accomplish here
+            [self triggerAction:nil];
+            
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                _volumeListener.runningVolumeNotification = FALSE;
+            });
+        });
+    }
+}
+
 
 @end
