@@ -10,8 +10,7 @@
 		189DC46C1A4DD02A005F686B /* GrayscaleContrastFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 189DC46B1A4DD02A005F686B /* GrayscaleContrastFilter.m */; };
 		189DC46E1A4DD1FD005F686B /* Vignette.acv in Resources */ = {isa = PBXBuildFile; fileRef = 189DC46D1A4DD1FD005F686B /* Vignette.acv */; };
 		1AC0BF081B5721A500A73CEC /* UIImage+Bundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AC0BF071B5721A500A73CEC /* UIImage+Bundle.m */; };
-		40A5BFD11BE19403009881C4 /* VolumeListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 40A5BFD01BE19403009881C4 /* VolumeListener.m */; };
-		40A5BFD31BE196EF009881C4 /* silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 40A5BFD21BE196EF009881C4 /* silence.mp3 */; };
+		4075D5791BE2ED1400468F98 /* RBVolumeButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */; };
 		40A5BFD61BE19828009881C4 /* UIViewController+Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 40A5BFD51BE19828009881C4 /* UIViewController+Camera.m */; };
 		653E218619474DA2001433A5 /* UIViewController+UIViewController_FullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 653E218519474DA2001433A5 /* UIViewController+UIViewController_FullScreen.m */; };
 		6548431C1958236B0008F803 /* DBCameraLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6548431B1958236B0008F803 /* DBCameraLoadingView.m */; };
@@ -66,9 +65,8 @@
 		189DC46D1A4DD1FD005F686B /* Vignette.acv */ = {isa = PBXFileReference; lastKnownFileType = file; path = Vignette.acv; sourceTree = "<group>"; };
 		1AC0BF061B5721A500A73CEC /* UIImage+Bundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Bundle.h"; sourceTree = "<group>"; };
 		1AC0BF071B5721A500A73CEC /* UIImage+Bundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Bundle.m"; sourceTree = "<group>"; };
-		40A5BFCF1BE19403009881C4 /* VolumeListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VolumeListener.h; sourceTree = "<group>"; };
-		40A5BFD01BE19403009881C4 /* VolumeListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VolumeListener.m; sourceTree = "<group>"; };
-		40A5BFD21BE196EF009881C4 /* silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = silence.mp3; sourceTree = "<group>"; };
+		4075D5771BE2ED1400468F98 /* RBVolumeButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBVolumeButtons.h; sourceTree = "<group>"; };
+		4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RBVolumeButtons.m; sourceTree = "<group>"; };
 		40A5BFD41BE19828009881C4 /* UIViewController+Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+Camera.h"; path = "../../../../FanFare/BKCamera/DBCamera/DBCamera/Categories/UIViewController+Camera.h"; sourceTree = "<group>"; };
 		40A5BFD51BE19828009881C4 /* UIViewController+Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+Camera.m"; path = "../../../../FanFare/BKCamera/DBCamera/DBCamera/Categories/UIViewController+Camera.m"; sourceTree = "<group>"; };
 		4BE3F8BFBAFD401181A3E55F /* libPods-DBCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DBCamera.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -285,8 +283,8 @@
 				9A1F4A77191C20CB0084C305 /* DBCollectionViewFlowLayout.m */,
 				9A2237F519894BAC0084BFD7 /* DBMotionManager.h */,
 				9A2237F619894BAC0084BFD7 /* DBMotionManager.m */,
-				40A5BFCF1BE19403009881C4 /* VolumeListener.h */,
-				40A5BFD01BE19403009881C4 /* VolumeListener.m */,
+				4075D5771BE2ED1400468F98 /* RBVolumeButtons.h */,
+				4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */,
 			);
 			name = Objects;
 			path = ../../DBCamera/Objects;
@@ -313,7 +311,6 @@
 		9A1F4A8D191C20F10084C305 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				40A5BFD21BE196EF009881C4 /* silence.mp3 */,
 				655AA2C11955FB040017C143 /* DBCameraImages.xcassets */,
 			);
 			name = Resources;
@@ -475,7 +472,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				40A5BFD31BE196EF009881C4 /* silence.mp3 in Resources */,
 				655AA2C51955FFC40017C143 /* 1977.acv in Resources */,
 				189DC46E1A4DD1FD005F686B /* Vignette.acv in Resources */,
 				A7CB737F1B68107B0017336F /* DBCamera.bundle in Resources */,
@@ -531,7 +527,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E8E34E51AFFABC600B451B1 /* (null) in Sources */,
-				40A5BFD11BE19403009881C4 /* VolumeListener.m in Sources */,
 				9A1F4A87191C20CB0084C305 /* DBLibraryManager.m in Sources */,
 				189DC46C1A4DD02A005F686B /* GrayscaleContrastFilter.m in Sources */,
 				9A1F4A8B191C20CB0084C305 /* DBCameraGridView.m in Sources */,
@@ -553,6 +548,7 @@
 				9ABB69A219587983007E2B9E /* UIImage+Asset.m in Sources */,
 				9AB597B0189BAF9A001BCAD3 /* main.m in Sources */,
 				9A1F4A8A191C20CB0084C305 /* DBCameraCropView.m in Sources */,
+				4075D5791BE2ED1400468F98 /* RBVolumeButtons.m in Sources */,
 				6594EE121955F19600E22EBD /* RootViewController.m in Sources */,
 				9A1F4A81191C20CB0084C305 /* DBCameraCollectionViewController.m in Sources */,
 				40A5BFD61BE19828009881C4 /* UIViewController+Camera.m in Sources */,

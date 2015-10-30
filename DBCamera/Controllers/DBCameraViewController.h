@@ -91,4 +91,5 @@
 @property (nonatomic, strong) CMMotionManager *motionManager;
 @property (nonatomic, assign) UIInterfaceOrientation orientationLast, orientationAfterProcess;
 
+
 @end

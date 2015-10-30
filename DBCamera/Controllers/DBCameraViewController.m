@@ -494,5 +494,4 @@
     [UIViewController rotatePinnedViews:self.pinnedViews forOrientation:toInterfaceOrientation];
 }
 
-
 @end

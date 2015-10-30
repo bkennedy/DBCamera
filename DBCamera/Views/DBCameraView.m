@@ -43,7 +43,7 @@
 }
 
 -(void)dealloc {
-    [self volumeButtonListeners:NO];
+    [self.buttonStealer stopStealingVolumeButtonEvents];
 }
 
 - (id) initWithFrame:(CGRect)frame captureSession:(AVCaptureSession *)captureSession
@@ -71,8 +71,14 @@
 
         self.tintColor = [UIColor whiteColor];
         self.selectedTintColor = [UIColor redColor];
+        
+        self.buttonStealer = [[RBVolumeButtons alloc] init];
+        __weak DBCameraView *weakSelf = self;
+        self.buttonStealer.upBlock = ^{
+            [weakSelf triggerAction:nil];
+        };
         scaleNum = 1;
-        [self volumeButtonListeners:YES];
+        [self.buttonStealer startStealingVolumeButtonEvents];
     }
 
     return self;
@@ -566,37 +572,5 @@
         [CATransaction commit];
     }
 }
-
-- (void) volumeButtonListeners:(BOOL)start
-{
-    if(start){
-        _volumeListener = [[VolumeListener alloc] init];
-        [[self viewWithTag:54870149] removeFromSuperview];
-        [self addSubview: [_volumeListener dummyVolume]];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
-    }
-    else{
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
-        [[self viewWithTag:54870149] removeFromSuperview];
-    }
-}
-
-- (void)volumeChanged:(NSNotification *)notification{
-    if(_volumeListener.runningVolumeNotification==FALSE){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            _volumeListener.runningVolumeNotification = TRUE;
-            MPMusicPlayerController *musicPlayer = [MPMusicPlayerController iPodMusicPlayer];
-            [musicPlayer setVolume:_volumeListener.systemVolume];
-            
-            // do what you want to accomplish here
-            [self triggerAction:nil];
-            
-            dispatch_async(dispatch_get_global_queue(0, 0), ^{
-                _volumeListener.runningVolumeNotification = FALSE;
-            });
-        });
-    }
-}
-
 
 @end
