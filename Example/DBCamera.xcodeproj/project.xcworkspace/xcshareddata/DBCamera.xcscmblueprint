@@ -1,14 +1,18 @@
 {
-  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3CC9B7EB6075F07926B8141D238E423C53906598",
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3CC9B7EB6075F07926B8141D238E423C53906598+++B85C907",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "3CC9B7EB6075F07926B8141D238E423C53906598" : 0
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++2FC28EF" : 0,
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++55B3DEE" : 0,
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++B85C907" : 0
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "764CFA1C-1485-44FA-A3CF-2BDF3BF8A19C",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "3CC9B7EB6075F07926B8141D238E423C53906598" : "..\/FanFare\/BKCamera\/DBCamera"
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++2FC28EF" : "..\/FanFare\/BKCamera\/DBCamera",
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++55B3DEE" : "..\/FanFare\/BKCamera\/DBCamera",
+    "3CC9B7EB6075F07926B8141D238E423C53906598+++B85C907" : "DBCamera\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "DBCamera",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
@@ -17,12 +21,17 @@
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/bkennedy\/DBCamera.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3CC9B7EB6075F07926B8141D238E423C53906598"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3CC9B7EB6075F07926B8141D238E423C53906598+++2FC28EF"
     },
     {
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/bkennedy\/DBCamera.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3CC9B7EB6075F07926B8141D238E423C53906598"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3CC9B7EB6075F07926B8141D238E423C53906598+++55B3DEE"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/bkennedy\/DBCamera.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3CC9B7EB6075F07926B8141D238E423C53906598+++B85C907"
     }
   ]
 }
