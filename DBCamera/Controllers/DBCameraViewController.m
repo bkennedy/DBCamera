@@ -64,7 +64,7 @@
 
     if ( self ) {
         _processingPhoto = NO;
-        _deviceOrientation = UIDeviceOrientationPortrait;
+        _deviceOrientation = [[UIDevice currentDevice] orientation];
         if ( delegate )
             _delegate = delegate;
 
