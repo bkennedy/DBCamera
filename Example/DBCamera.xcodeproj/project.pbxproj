@@ -10,8 +10,8 @@
 		189DC46C1A4DD02A005F686B /* GrayscaleContrastFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 189DC46B1A4DD02A005F686B /* GrayscaleContrastFilter.m */; };
 		189DC46E1A4DD1FD005F686B /* Vignette.acv in Resources */ = {isa = PBXBuildFile; fileRef = 189DC46D1A4DD1FD005F686B /* Vignette.acv */; };
 		1AC0BF081B5721A500A73CEC /* UIImage+Bundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AC0BF071B5721A500A73CEC /* UIImage+Bundle.m */; };
-		4075D5791BE2ED1400468F98 /* RBVolumeButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */; };
 		40A5BFD61BE19828009881C4 /* UIViewController+Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 40A5BFD51BE19828009881C4 /* UIViewController+Camera.m */; };
+		40C8F8A91BF15C79004BB9FC /* JPSVolumeButtonHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 40C8F8A81BF15C79004BB9FC /* JPSVolumeButtonHandler.m */; };
 		653E218619474DA2001433A5 /* UIViewController+UIViewController_FullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 653E218519474DA2001433A5 /* UIViewController+UIViewController_FullScreen.m */; };
 		6548431C1958236B0008F803 /* DBCameraLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6548431B1958236B0008F803 /* DBCameraLoadingView.m */; };
 		655AA2B01955FA350017C143 /* CustomCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = 655AA2AF1955FA350017C143 /* CustomCamera.m */; };
@@ -65,10 +65,10 @@
 		189DC46D1A4DD1FD005F686B /* Vignette.acv */ = {isa = PBXFileReference; lastKnownFileType = file; path = Vignette.acv; sourceTree = "<group>"; };
 		1AC0BF061B5721A500A73CEC /* UIImage+Bundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Bundle.h"; sourceTree = "<group>"; };
 		1AC0BF071B5721A500A73CEC /* UIImage+Bundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Bundle.m"; sourceTree = "<group>"; };
-		4075D5771BE2ED1400468F98 /* RBVolumeButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBVolumeButtons.h; sourceTree = "<group>"; };
-		4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RBVolumeButtons.m; sourceTree = "<group>"; };
 		40A5BFD41BE19828009881C4 /* UIViewController+Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+Camera.h"; path = "../../../../FanFare/BKCamera/DBCamera/DBCamera/Categories/UIViewController+Camera.h"; sourceTree = "<group>"; };
 		40A5BFD51BE19828009881C4 /* UIViewController+Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+Camera.m"; path = "../../../../FanFare/BKCamera/DBCamera/DBCamera/Categories/UIViewController+Camera.m"; sourceTree = "<group>"; };
+		40C8F8A71BF15C79004BB9FC /* JPSVolumeButtonHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JPSVolumeButtonHandler.h; sourceTree = "<group>"; };
+		40C8F8A81BF15C79004BB9FC /* JPSVolumeButtonHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JPSVolumeButtonHandler.m; sourceTree = "<group>"; };
 		4BE3F8BFBAFD401181A3E55F /* libPods-DBCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DBCamera.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CD22A93BC5AAC7ACFAE4C92 /* Pods-DBCamera.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DBCamera.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DBCamera/Pods-DBCamera.debug.xcconfig"; sourceTree = "<group>"; };
 		653E218419474DA2001433A5 /* UIViewController+UIViewController_FullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+UIViewController_FullScreen.h"; sourceTree = "<group>"; };
@@ -275,6 +275,8 @@
 		9A1F4A71191C20CB0084C305 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
+				40C8F8A71BF15C79004BB9FC /* JPSVolumeButtonHandler.h */,
+				40C8F8A81BF15C79004BB9FC /* JPSVolumeButtonHandler.m */,
 				9A71D2EB1958402A00224B82 /* DBCameraFilterCell.h */,
 				9A71D2EC1958402A00224B82 /* DBCameraFilterCell.m */,
 				9A1F4A74191C20CB0084C305 /* DBCollectionViewCell.h */,
@@ -283,8 +285,6 @@
 				9A1F4A77191C20CB0084C305 /* DBCollectionViewFlowLayout.m */,
 				9A2237F519894BAC0084BFD7 /* DBMotionManager.h */,
 				9A2237F619894BAC0084BFD7 /* DBMotionManager.m */,
-				4075D5771BE2ED1400468F98 /* RBVolumeButtons.h */,
-				4075D5781BE2ED1400468F98 /* RBVolumeButtons.m */,
 			);
 			name = Objects;
 			path = ../../DBCamera/Objects;
@@ -544,11 +544,11 @@
 				9A383B181B2A39E700C3ED80 /* DemoNavigationController.m in Sources */,
 				9A1F4A80191C20CB0084C305 /* DBCameraBaseCropViewController.m in Sources */,
 				9A1F4A7F191C20CB0084C305 /* UIImage+Crop.m in Sources */,
+				40C8F8A91BF15C79004BB9FC /* JPSVolumeButtonHandler.m in Sources */,
 				9A2237F719894BAC0084BFD7 /* DBMotionManager.m in Sources */,
 				9ABB69A219587983007E2B9E /* UIImage+Asset.m in Sources */,
 				9AB597B0189BAF9A001BCAD3 /* main.m in Sources */,
 				9A1F4A8A191C20CB0084C305 /* DBCameraCropView.m in Sources */,
-				4075D5791BE2ED1400468F98 /* RBVolumeButtons.m in Sources */,
 				6594EE121955F19600E22EBD /* RootViewController.m in Sources */,
 				9A1F4A81191C20CB0084C305 /* DBCameraCollectionViewController.m in Sources */,
 				40A5BFD61BE19828009881C4 /* UIViewController+Camera.m in Sources */,

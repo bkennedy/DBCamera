@@ -12,6 +12,7 @@
 #import "UIImage+TintColor.h"
 #import "UIImage+Bundle.h"
 
+
 #import <AssetsLibrary/AssetsLibrary.h>
 
 #define previewFrame (CGRect){ 0, 65, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
@@ -42,12 +43,6 @@
     return [[self alloc] initWithFrame:[[UIScreen mainScreen] bounds] captureSession:captureSession];
 }
 
--(void)dealloc {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-    [self.buttonStealer stopStealingVolumeButtonEvents];
-#endif
-}
-
 - (id) initWithFrame:(CGRect)frame captureSession:(AVCaptureSession *)captureSession
 {
     self = [super initWithFrame:frame];
@@ -74,19 +69,18 @@
         self.tintColor = [UIColor whiteColor];
         self.selectedTintColor = [UIColor redColor];
         
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-        self.buttonStealer = [[RBVolumeButtons alloc] init];
-        __weak DBCameraView *weakSelf = self;
-        self.buttonStealer.upBlock = ^{
-            [weakSelf triggerAction:nil];
-        };
-        [self.buttonStealer startStealingVolumeButtonEvents];
-#endif
+        self.volumeButtonHandler = [JPSVolumeButtonHandler volumeButtonHandlerWithUpBlock:^{
+            [self triggerAction:_triggerButton];
+        } downBlock:^{
+            
+        }];
+        
         scaleNum = 1;
     }
 
     return self;
 }
+
 
 - (void) defaultInterface
 {

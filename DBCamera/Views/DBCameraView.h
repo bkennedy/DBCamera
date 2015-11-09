@@ -9,10 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "DBCameraDelegate.h"
+#import "JPSVolumeButtonHandler.h"
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-    #import "RBVolumeButtons.h"
-#endif
 /**
  *  The view class that contains the UI of the camera. Extend this class if you want to create a custom camera view.
  */
@@ -97,9 +95,7 @@
  */
 @property (nonatomic, strong)   UIPinchGestureRecognizer *pinch;
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED <= 60000
-@property (nonatomic,strong)    RBVolumeButtons *buttonStealer;
-#endif
+@property (nonatomic,retain)    JPSVolumeButtonHandler *volumeButtonHandler;
 
 @property (nonatomic,assign)    BOOL panning;
 @property (nonatomic,assign)    UIDeviceOrientation deviceOrientation;
