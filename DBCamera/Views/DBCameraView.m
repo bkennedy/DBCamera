@@ -43,7 +43,9 @@
 }
 
 -(void)dealloc {
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
     [self.buttonStealer stopStealingVolumeButtonEvents];
+#endif
 }
 
 - (id) initWithFrame:(CGRect)frame captureSession:(AVCaptureSession *)captureSession
@@ -72,13 +74,15 @@
         self.tintColor = [UIColor whiteColor];
         self.selectedTintColor = [UIColor redColor];
         
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
         self.buttonStealer = [[RBVolumeButtons alloc] init];
         __weak DBCameraView *weakSelf = self;
         self.buttonStealer.upBlock = ^{
             [weakSelf triggerAction:nil];
         };
-        scaleNum = 1;
         [self.buttonStealer startStealingVolumeButtonEvents];
+#endif
+        scaleNum = 1;
     }
 
     return self;

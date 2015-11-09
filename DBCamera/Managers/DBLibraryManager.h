@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-
+#import <UIKit/UIKit.h>
 /**
  *  Completion block for groups items
  *

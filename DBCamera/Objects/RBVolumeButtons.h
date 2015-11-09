@@ -7,10 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 typedef void (^ButtonBlock)();
 
 @interface RBVolumeButtons : NSObject
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+
 {
    float launchVolume;
    BOOL hadToLowerVolume;
@@ -28,5 +31,5 @@ typedef void (^ButtonBlock)();
 
 -(void)startStealingVolumeButtonEvents;
 -(void)stopStealingVolumeButtonEvents;
-
+#endif
 @end

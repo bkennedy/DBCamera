@@ -11,6 +11,8 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 @interface RBVolumeButtons()
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+
 -(void)initializeVolumeButtonStealer;
 -(void)volumeDown;
 -(void)volumeUp;
@@ -226,5 +228,5 @@ void volumeListenerCallback (
 {
    AudioSessionAddPropertyListener(kAudioSessionProperty_CurrentHardwareOutputVolume, volumeListenerCallback, (__bridge void*) self);
 }
-
+#endif
 @end
