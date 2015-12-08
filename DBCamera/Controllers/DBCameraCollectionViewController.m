@@ -73,7 +73,7 @@
     PHAsset *object = self.items[indexPath.row];
     [[PHImageManager defaultManager] requestImageForAsset:(PHAsset *)object
                                                targetSize:CGSizeMake(item.itemImage.frame.size.width, item.itemImage.frame.size.height)
-                                              contentMode:PHImageContentModeDefault
+                                              contentMode:PHImageContentModeAspectFill
                                                   options:nil
                                             resultHandler:^(UIImage *result, NSDictionary *info) {
                                                 dispatch_async(dispatch_get_main_queue(), ^{
