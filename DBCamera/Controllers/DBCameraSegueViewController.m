@@ -90,7 +90,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
         
         [self setSourceImage:image];
         [self setPreviewImage:thumb];
-        [self setCropRect:(CGRect){ 0, 320 }];
+        [self setCropRect:CGRectNull];
         [self setMinimumScale:.2];
         [self setMaximumScale:10];
         [self createInterface];
@@ -129,7 +129,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
     _pFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (360 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((320 * scaleFactor)) };
     _lFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (240 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((240 * scaleFactor)) };
     
-    [self setCropRect:self.previewImage.size.width > self.previewImage.size.height ? _lFrame : _pFrame];
+    [self setCropRect:CGRectNull];
     
     [self.view addSubview:self.filtersView];
     [self.view addSubview:self.navigationBar];
@@ -146,7 +146,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
     
     if ( _forceQuadCrop ) {
         [self setCropMode:YES];
-        [self setCropRect:_pFrame];
+        [self setCropRect: CGRectIsNull(self.cropRect) ? self.previewImage.size.width > self.previewImage.size.height ? _lFrame : _pFrame : self.cropRect];
         [self reset:YES];
     }
     
@@ -164,7 +164,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
 {
     [button setSelected:!button.isSelected];
     [self setCropMode:button.isSelected];
-    [self setCropRect:button.isSelected ? _pFrame : _lFrame];
+    [self setCropRect: !CGRectIsNull(self.cropRect) ? self.cropRect : button.isSelected ? _pFrame : _lFrame];
     [self reset:YES];
 }
 

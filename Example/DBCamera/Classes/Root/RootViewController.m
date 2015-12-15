@@ -125,19 +125,20 @@ typedef void (^TableRowBlock)();
  
     DBCameraContainerViewController *cameraContainer = [[DBCameraContainerViewController alloc] initWithDelegate:self cameraSettingsBlock:^(DBCameraView *cameraView, DBCameraContainerViewController *container) {
         [cameraView.photoLibraryButton setHidden:NO]; //Hide Library button
-//        CGSize size = CGSizeMake(11.0f, 9.0f);
-        cameraView.previewLayer.frame =  AVMakeRectWithAspectRatioInsideRect(kAspectRatio, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+        CGSize size = CGSizeMake(11.0f, 9.0f);
+        container.cameraViewController.forceQuadCrop = YES;
+        cameraView.previewLayer.frame =  AVMakeRectWithAspectRatioInsideRect(size, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
         container.cameraViewController.cameraManager.previewLayer = cameraView.previewLayer;
-        //Override the camera grid
-        DBCameraGridView *cameraGridView = [[DBCameraGridView alloc] initWithFrame:cameraView.previewLayer.frame];
-        [cameraGridView setNumberOfColumns:4];
-        [cameraGridView setNumberOfRows:4];
-        [cameraGridView setAlpha:0];
-        [container.cameraViewController setCameraGridView:cameraGridView];
+//        //Override the camera grid
+//        DBCameraGridView *cameraGridView = [[DBCameraGridView alloc] initWithFrame:cameraView.previewLayer.frame];
+//        [cameraGridView setNumberOfColumns:4];
+//        [cameraGridView setNumberOfRows:4];
+//        [cameraGridView setAlpha:0];
+//        [container.cameraViewController setCameraGridView:cameraGridView];
         [container.cameraViewController setUseCameraSegue:YES];
         [container.cameraViewController setCameraSegueConfigureBlock:^(DBCameraSegueViewController *segue) {
             segue.cropMode = YES;
-            segue.cropRect = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+            segue.cropRect = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (size.height/size.width));
         }];
 
     }];
