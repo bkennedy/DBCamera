@@ -11,8 +11,11 @@
 #import "DBCameraViewController.h"
 #import "DBCameraContainerViewController.h"
 #import "DBCameraLibraryViewController.h"
+#import "DBCameraSegueViewController.h"
 #import "CustomCamera.h"
 #import "DBCameraGridView.h"
+#import "DBCameraManager.h"
+#import "DBCameraMacros.h"
 
 @interface DetailViewController : UIViewController {
     UIImageView *_imageView;
@@ -117,28 +120,35 @@ typedef void (^TableRowBlock)();
 
 - (void) openCamera
 {
-/*
+
 //If you want to customize the camera view, use initWithDelegate:cameraSettingsBlock:
  
     DBCameraContainerViewController *cameraContainer = [[DBCameraContainerViewController alloc] initWithDelegate:self cameraSettingsBlock:^(DBCameraView *cameraView, DBCameraContainerViewController *container) {
-        [cameraView.photoLibraryButton setHidden:YES]; //Hide Library button
-     
+        [cameraView.photoLibraryButton setHidden:NO]; //Hide Library button
+//        CGSize size = CGSizeMake(11.0f, 9.0f);
+        cameraView.previewLayer.frame =  AVMakeRectWithAspectRatioInsideRect(kAspectRatio, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+        container.cameraViewController.cameraManager.previewLayer = cameraView.previewLayer;
         //Override the camera grid
         DBCameraGridView *cameraGridView = [[DBCameraGridView alloc] initWithFrame:cameraView.previewLayer.frame];
         [cameraGridView setNumberOfColumns:4];
         [cameraGridView setNumberOfRows:4];
         [cameraGridView setAlpha:0];
         [container.cameraViewController setCameraGridView:cameraGridView];
-        [container.cameraViewController setUseCameraSegue:NO];
+        [container.cameraViewController setUseCameraSegue:YES];
+        [container.cameraViewController setCameraSegueConfigureBlock:^(DBCameraSegueViewController *segue) {
+            segue.cropMode = YES;
+            segue.cropRect = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+        }];
+
     }];
 
 //Set the Tint Color and the Selected Color
     [cameraContainer setTintColor:[UIColor redColor]];
     [cameraContainer setSelectedTintColor:[UIColor yellowColor]];
-*/
 
-    DBCameraContainerViewController *cameraContainer = [[DBCameraContainerViewController alloc] initWithDelegate:self];
-    [cameraContainer setFullScreenMode];
+
+//    DBCameraContainerViewController *cameraContainer = [[DBCameraContainerViewController alloc] initWithDelegate:self];
+//    [cameraContainer setFullScreenMode];
     
     DemoNavigationController *nav = [[DemoNavigationController alloc] initWithRootViewController:cameraContainer];
     [self presentViewController:nav animated:YES completion:nil];
@@ -170,7 +180,10 @@ typedef void (^TableRowBlock)();
 - (void) openCameraWithForceQuad
 {
     DBCameraViewController *cameraController = [DBCameraViewController initWithDelegate:self];
-    [cameraController setForceQuadCrop:YES];
+    [cameraController setCameraSegueConfigureBlock:^(DBCameraSegueViewController *segue) {
+        segue.cropMode = YES;
+        segue.cropRect = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+    }];
     
     DBCameraContainerViewController *container = [[DBCameraContainerViewController alloc] initWithDelegate:self];
     [container setCameraViewController:cameraController];

@@ -61,6 +61,12 @@
 @property (nonatomic, assign, readonly) NSUInteger cameraCount;
 
 /**
+ *  The Preview Layer if we want to specify a rect to take the picture from
+ */
+
+@property (nonatomic,assign) AVCaptureVideoPreviewLayer *previewLayer;
+
+/**
  *  Set the camera max scale
  *
  *  @param maxScale The max scale value

@@ -163,6 +163,20 @@
              NSDictionary *meta = [[NSDictionary alloc] initWithDictionary:(__bridge NSDictionary *)(metadata)];
              CFRelease(metadata);
              
+             if (_previewLayer) {
+                 
+                 CGRect outputRect = [_previewLayer metadataOutputRectOfInterestForRect:_previewLayer.bounds];
+                 CGImageRef takenCGImage = image.CGImage;
+                 size_t width = CGImageGetWidth(takenCGImage);
+                 size_t height = CGImageGetHeight(takenCGImage);
+                 CGRect cropRect = CGRectMake(outputRect.origin.x * width, outputRect.origin.y * height, outputRect.size.width * width, outputRect.size.height * height);
+                 
+                 CGImageRef cropCGImage = CGImageCreateWithImageInRect(takenCGImage, cropRect);
+                 image = [UIImage imageWithCGImage:cropCGImage scale:1 orientation:image.imageOrientation];
+                 CGImageRelease(cropCGImage);
+             
+             }
+             
              if ( [delegateBlock respondsToSelector:@selector(captureImageDidFinish:withMetadata:)] )
                  [delegateBlock captureImageDidFinish:image withMetadata:meta];
          } else if ( error ) {

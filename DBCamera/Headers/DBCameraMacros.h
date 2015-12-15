@@ -27,5 +27,5 @@
 #endif
 #endif
 
-#define kAspectRatio (9.0f/11.0f)
+#define kAspectRatio (CGSize){11.0f, 9.0f}
 #endif

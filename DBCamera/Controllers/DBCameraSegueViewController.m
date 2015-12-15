@@ -90,7 +90,7 @@ static const CGSize kFilterCellSize = { 75, 90 };
         
         [self setSourceImage:image];
         [self setPreviewImage:thumb];
-        [self setCropRect:(CGRect){ 0, 320 * kAspectRatio }];
+        [self setCropRect:(CGRect){ 0, 320 }];
         [self setMinimumScale:.2];
         [self setMaximumScale:10];
         [self createInterface];
@@ -126,8 +126,8 @@ static const CGSize kFilterCellSize = { 75, 90 };
     
     CGFloat cropX = ( CGRectGetWidth( self.frameView.frame) - (320 * scaleFactor)) * .5;
     
-    _pFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (360 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((320 * scaleFactor) * kAspectRatio) };
-    _lFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (240 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((240 * scaleFactor) * kAspectRatio) };
+    _pFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (360 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((320 * scaleFactor)) };
+    _lFrame = (CGRect){ cropX, ( CGRectGetHeight( self.frameView.frame) - (240 * scaleFactor) ) * .5, (320 * scaleFactor), CGFLOAT_CEIL((240 * scaleFactor)) };
     
     [self setCropRect:self.previewImage.size.width > self.previewImage.size.height ? _lFrame : _pFrame];
     
