@@ -106,7 +106,7 @@
     }
 
     id camera =_customCamera ?: _cameraView;
-    [camera insertSubview:self.cameraGridView atIndex:1];
+    [((DBCameraView *)camera).previewView insertSubview:self.cameraGridView atIndex:1];
     
     if ( [camera respondsToSelector:@selector(cameraButton)] ) {
         [(DBCameraView *)camera cameraButton].enabled = [self.cameraManager hasMultipleCameras];
@@ -132,6 +132,8 @@
         [weakSelf rotationChanged:orientation];
     }];
     [[DBMotionManager sharedManager] startMotionHandler];
+    
+    [self.cameraView setupVolumeButtons];
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -146,6 +148,7 @@
 - (void) viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    [self.cameraView removeVolumeButtons];
     [self.motionManager stopAccelerometerUpdates];
     [self.cameraManager performSelector:@selector(stopRunning) withObject:nil afterDelay:0.0];
 }
@@ -192,10 +195,10 @@
 {
     if ( !_cameraView ) {
         _cameraView = [DBCameraView initWithCaptureSession:self.cameraManager.captureSession];
+        [_cameraView setDelegate:self];
         [_cameraView setTintColor:self.tintColor];
         [_cameraView setSelectedTintColor:self.selectedTintColor];
         [_cameraView defaultInterface];
-        [_cameraView setDelegate:self];
     }
 
     return _cameraView;
@@ -215,7 +218,7 @@
 {
     if ( !_cameraGridView ) {
         DBCameraView *camera =_customCamera ?: _cameraView;
-        _cameraGridView = [[DBCameraGridView alloc] initWithFrame:camera.previewLayer.frame];
+        _cameraGridView = [[DBCameraGridView alloc] initWithFrame:camera.previewView.frame];
         [_cameraGridView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
         [_cameraGridView setNumberOfColumns:2];
         [_cameraGridView setNumberOfRows:2];
@@ -297,6 +300,10 @@
 {
     if ( [self.cameraManager hasFlash] )
         [self.cameraManager setFlashMode:flashMode];
+}
+
+- (BOOL) hasFlash {
+    return [self.cameraManager hasFlash];
 }
 
 - (void) captureImageDidFinish:(UIImage *)image withMetadata:(NSDictionary *)metadata

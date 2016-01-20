@@ -74,6 +74,7 @@
  *  The camera preview layer
  */
 @property (nonatomic, strong, readonly) AVCaptureVideoPreviewLayer *previewLayer;
+@property (nonatomic, strong) UIView *previewView;
 
 /**
  *  Single tap gesture recognizes the focus action
@@ -156,5 +157,7 @@
 - (void) pinchCameraViewWithScalNum:(CGFloat)scale;
 - (void) triggerAction:(UIButton *)button;
 
+- (void)setupVolumeButtons;
+- (void)removeVolumeButtons;
 
 @end

@@ -21,4 +21,6 @@ typedef void (^JPSVolumeButtonBlock)();
 // Returns a button handler with the specified up/down volume button blocks
 + (instancetype)volumeButtonHandlerWithUpBlock:(JPSVolumeButtonBlock)upBlock downBlock:(JPSVolumeButtonBlock)downBlock;
 
+-(void)stopObserving;
+-(void)startObserving;
 @end

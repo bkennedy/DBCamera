@@ -15,7 +15,9 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 
-#define previewFrame (CGRect){ 0, 65, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
+#define previewFrame (CGRect){ 0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
+
+#define kToolFrameHeight 65
 
 #define kDefaultFlashSetting @"kDefaultFlashSetting"
 
@@ -64,16 +66,19 @@
 
         [_previewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
 
-        [self.layer addSublayer:_previewLayer];
+        _previewView = [[UIView alloc] initWithFrame:_previewLayer.frame];
+        _previewView.userInteractionEnabled = YES;
+        _previewView.bounds = _previewView.frame;
+        _previewView.layer.bounds = _previewView.frame;
+        _previewLayer.bounds = _previewLayer.frame;
+        [self addSubview:self.previewView];
+        self.previewView.clipsToBounds = YES;
+        [self.previewView.layer addSublayer:_previewLayer];
+        self.previewView.layer.masksToBounds = YES;
 
         self.tintColor = [UIColor whiteColor];
         self.selectedTintColor = [UIColor redColor];
         
-        self.volumeButtonHandler = [JPSVolumeButtonHandler volumeButtonHandlerWithUpBlock:^{
-            [self triggerAction:_triggerButton];
-        } downBlock:^{
-            
-        }];
         
         scaleNum = 1;
     }
@@ -81,6 +86,23 @@
     return self;
 }
 
+- (void)setupVolumeButtons {
+    
+    self.volumeButtonHandler = [JPSVolumeButtonHandler volumeButtonHandlerWithUpBlock:^{
+        [self.volumeButtonHandler stopObserving];
+        [self triggerAction:_triggerButton];
+    } downBlock:^{
+        [self.volumeButtonHandler stopObserving];
+        [self triggerAction:_triggerButton];
+    }];
+    
+    [self.volumeButtonHandler startObserving];
+
+}
+
+- (void)removeVolumeButtons {
+    self.volumeButtonHandler = nil;
+}
 
 - (void) defaultInterface
 {
@@ -104,6 +126,12 @@
     [self.bottomContainerBar addSubview:self.triggerButton];
     [self.bottomContainerBar addSubview:self.closeButton];
     [self.bottomContainerBar addSubview:self.photoLibraryButton];
+    
+    if (self.delegate.hasFlash)
+        self.flashButton.hidden = NO;
+    else
+        self.flashButton.hidden = YES;
+    
     [self createGesture];
 }
 
@@ -112,7 +140,7 @@
 - (UIView *) topContainerBar
 {
     if ( !_topContainerBar ) {
-        _topContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, CGRectGetWidth(self.bounds), CGRectGetMinY(previewFrame) }];
+        _topContainerBar = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, CGRectGetWidth(self.bounds), kToolFrameHeight }];
         [_topContainerBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [_topContainerBar setBackgroundColor:RGBColor(0x000000, 1)];
     }
@@ -382,6 +410,11 @@
     [self.flashButton setEnabled:!button.isSelected];
     if ( [self.delegate respondsToSelector:@selector(switchCamera)] )
         [self.delegate switchCamera];
+    
+    if ( !self.delegate.hasFlash)
+        self.flashButton.hidden = YES;
+    else
+        self.flashButton.hidden = NO;
 }
 
 - (void) close
@@ -399,8 +432,8 @@
 - (void) tapToFocus:(UIGestureRecognizer *)recognizer
 {
     CGPoint tempPoint = (CGPoint)[recognizer locationInView:self];
-    if ( [_delegate respondsToSelector:@selector(cameraView:focusAtPoint:)] && CGRectContainsPoint(_previewLayer.frame, tempPoint) ){
-        [_delegate cameraView:self focusAtPoint:(CGPoint){ tempPoint.x, tempPoint.y - CGRectGetMinY(_previewLayer.frame) }];
+    if ( [_delegate respondsToSelector:@selector(cameraView:focusAtPoint:)] && CGRectContainsPoint(_previewView.frame, tempPoint) ){
+        [_delegate cameraView:self focusAtPoint:(CGPoint){ tempPoint.x, tempPoint.y - CGRectGetMinY(_previewView.frame) }];
         [self drawFocusBoxAtPointOfInterest:tempPoint andRemove:YES];
     }
 }
@@ -408,8 +441,8 @@
 - (void) tapToExpose:(UIGestureRecognizer *)recognizer
 {
     CGPoint tempPoint = (CGPoint)[recognizer locationInView:self];
-    if ( [_delegate respondsToSelector:@selector(cameraView:exposeAtPoint:)] && CGRectContainsPoint(_previewLayer.frame, tempPoint) ){
-        [_delegate cameraView:self exposeAtPoint:(CGPoint){ tempPoint.x, tempPoint.y - CGRectGetMinY(_previewLayer.frame) }];
+    if ( [_delegate respondsToSelector:@selector(cameraView:exposeAtPoint:)] && CGRectContainsPoint(_previewView.frame, tempPoint) ){
+        [_delegate cameraView:self exposeAtPoint:(CGPoint){ tempPoint.x, tempPoint.y - CGRectGetMinY(_previewView.frame) }];
         [self drawExposeBoxAtPointOfInterest:tempPoint andRemove:YES];
     }
 }
@@ -472,7 +505,7 @@
             NSUInteger numTouches = [panGestureRecognizer numberOfTouches], i;
             for ( i = 0; i < numTouches; ++i ) {
                 CGPoint location = [panGestureRecognizer locationOfTouch:i inView:self];
-                CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:_previewLayer.superlayer];
+                CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:self.layer];
                 if ( ! [_previewLayer containsPoint:convertedLocation] ) {
                     allTouchesAreOnThePreviewLayer = NO;
                     break;
@@ -517,7 +550,7 @@
     NSUInteger numTouches = [pinchGestureRecognizer numberOfTouches], i;
     for ( i = 0; i < numTouches; ++i ) {
         CGPoint location = [pinchGestureRecognizer locationOfTouch:i inView:self];
-        CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:_previewLayer.superlayer];
+        CGPoint convertedLocation = [_previewLayer convertPoint:location fromLayer:self.layer];
         if ( ! [_previewLayer containsPoint:convertedLocation] ) {
             allTouchesAreOnThePreviewLayer = NO;
             break;

@@ -33,13 +33,12 @@ static CGFloat minVolume                    = 0.00001f;
     if (self) {
         _appIsActive = YES;
         [self setupSession];
-        [self disableVolumeHUD];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidChangeActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidChangeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         
         // Wait for the volume view to be ready before setting the volume to avoid showing the HUD
-        double delayInSeconds = 0.1f;
+        double delayInSeconds = 0.5f;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [self setInitialVolume];
@@ -51,15 +50,34 @@ static CGFloat minVolume                    = 0.00001f;
 - (void)dealloc {
     // https://github.com/jpsim/JPSVolumeButtonHandler/issues/11
     // http://nshipster.com/key-value-observing/#safe-unsubscribe-with-@try-/-@catch
-    @try {
-        [self.session removeObserver:self forKeyPath:sessionVolumeKeyPath];
-    }
-    @catch (NSException * __unused exception) {
+    if (self.session) {
+        @try {
+            [self.session removeObserver:self forKeyPath:sessionVolumeKeyPath];
+            self.session = nil;
+        }
+        @catch (NSException * __unused exception) {
+        }
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.volumeView removeFromSuperview];
 }
 
+-(void) stopObserving {
+    @try {
+        [self.session removeObserver:self forKeyPath:sessionVolumeKeyPath];
+        self.session = nil;
+    }
+    @catch (NSException * __unused exception) {
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//    [self.volumeView removeFromSuperview];
+
+}
+
+-(void)startObserving {
+    [self disableVolumeHUD];
+
+}
 - (void)setupSession {
     NSError *error = nil;
     self.session = [AVAudioSession sharedInstance];
@@ -112,7 +130,9 @@ static CGFloat minVolume                    = 0.00001f;
 }
 
 - (void)disableVolumeHUD {
-    self.volumeView = [[MPVolumeView alloc] initWithFrame:CGRectMake(MAXFLOAT, MAXFLOAT, 0, 0)];
+    self.volumeView = [[MPVolumeView alloc] initWithFrame:CGRectMake(0.0f, -200.0f, 320.0f, 100.0f)];
+    self.volumeView.hidden = NO;
+    self.volumeView.showsRouteButton = NO;
     [[[[UIApplication sharedApplication] windows] firstObject] addSubview:self.volumeView];
 }
 
