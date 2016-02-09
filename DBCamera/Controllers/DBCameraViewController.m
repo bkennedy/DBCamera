@@ -341,7 +341,7 @@
 - (void) captureImageFailedWithError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     });
 }
 
@@ -375,7 +375,7 @@
         }];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title") message:DBCameraLocalizedStrings(@"pickerimage.nopolicy") delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil] show];
+            [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title") message:DBCameraLocalizedStrings(@"pickerimage.nopolicy") delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
         });
     }
 }
@@ -396,7 +396,7 @@
             [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title")
                                         message:DBCameraLocalizedStrings(@"cameraimage.nopolicy")
                                        delegate:nil
-                              cancelButtonTitle:@"Ok"
+                              cancelButtonTitle:@"OK"
                               otherButtonTitles:nil, nil] show];
 
             return;

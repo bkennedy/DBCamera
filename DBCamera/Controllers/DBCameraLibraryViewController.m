@@ -174,7 +174,7 @@
             [[[UIAlertView alloc] initWithTitle:DBCameraLocalizedStrings(@"general.error.title")
                                         message:DBCameraLocalizedStrings(@"pickerimage.nophoto")
                                        delegate:nil
-                              cancelButtonTitle:@"Ok"
+                              cancelButtonTitle:@"OK"
                               otherButtonTitles:nil, nil] show];
         });
     }
