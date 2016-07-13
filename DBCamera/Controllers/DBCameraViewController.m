@@ -84,11 +84,17 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    AudioSessionInitialize(NULL, NULL, NULL, NULL);
+    AudioSessionSetActive(YES);
 
     [self.view setBackgroundColor:[UIColor blackColor]];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:)
                                                  name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:)
+                                                 name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+
 
     NSError *error;
     if ( [self.cameraManager setupSessionWithPreset:AVCaptureSessionPresetPhoto error:&error] ) {
@@ -104,6 +110,14 @@
         } else
             [self.view addSubview:self.cameraView];
     }
+    
+    _volume = AVAudioSession.sharedInstance.outputVolume;
+
+
+    _volumeView = [[MPVolumeView alloc] initWithFrame: CGRectZero];
+
+    [self.view addSubview: _volumeView];
+    [self.view sendSubviewToBack:_volumeView];
 
     id camera =_customCamera ?: _cameraView;
     [((DBCameraView *)camera).previewView insertSubview:self.cameraGridView atIndex:1];
@@ -122,18 +136,40 @@
 
 }
 
+-(void) volumeChanged:(NSNotification*)notification {
+    
+    NSPredicate *sliders = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject isKindOfClass:[UISlider class]];
+    }];
+    
+    
+    UISlider *slider = [self.volumeView.subviews filteredArrayUsingPredicate:sliders].firstObject;
+
+    NSDictionary *userInfo = notification.userInfo;
+    NSString *changeReason = userInfo[@"AVSystemController_AudioVolumeChangeReasonNotificationParameter"];
+    if ([changeReason isEqualToString:@"ExplicitVolumeChange"]) {
+        [slider setValue:self.volume animated: NO];
+
+        if (!self.takenPhoto) {
+            self.takenPhoto = YES;
+            [self.cameraView triggerAction:self.cameraView.triggerButton];
+        }
+    }
+    
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     [self.cameraManager performSelector:@selector(startRunning) withObject:nil afterDelay:0.0];
-    
+    self.takenPhoto = NO;
     __weak typeof(self) weakSelf = self;
     [[DBMotionManager sharedManager] setMotionRotationHandler:^(UIDeviceOrientation orientation){
         [weakSelf rotationChanged:orientation];
     }];
     [[DBMotionManager sharedManager] startMotionHandler];
     
-    [self.cameraView setupVolumeButtons];
+//    [self.cameraView setupVolumeButtons];
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -148,7 +184,7 @@
 - (void) viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self.cameraView removeVolumeButtons];
+//    [self.cameraView removeVolumeButtons];
     [self.motionManager stopAccelerometerUpdates];
     [self.cameraManager performSelector:@selector(stopRunning) withObject:nil afterDelay:0.0];
 }
@@ -408,7 +444,7 @@
         }
     }
 
-    [self.cameraManager captureImageForDeviceOrientation:_deviceOrientation];
+    [self.cameraManager captureImageForDeviceOrientation:self.pinnedViews.count > 0 ? [(UIView*)self.pinnedViews[0] tag] : _deviceOrientation];// _deviceOrientation];
 }
 
 - (void) cameraView:(UIView *)camera focusAtPoint:(CGPoint)point

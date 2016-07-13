@@ -15,9 +15,9 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 
-#define previewFrame (CGRect){ 0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
 
-#define kToolFrameHeight 65
+#define previewFrame (CGRect){ 0, kToolFrameHeight, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height - 138 }
+
 
 #define kDefaultFlashSetting @"kDefaultFlashSetting"
 
@@ -84,24 +84,6 @@
     }
 
     return self;
-}
-
-- (void)setupVolumeButtons {
-    
-    self.volumeButtonHandler = [JPSVolumeButtonHandler volumeButtonHandlerWithUpBlock:^{
-        [self.volumeButtonHandler stopObserving];
-        [self triggerAction:_triggerButton];
-    } downBlock:^{
-        [self.volumeButtonHandler stopObserving];
-        [self triggerAction:_triggerButton];
-    }];
-    
-    [self.volumeButtonHandler startObserving];
-
-}
-
-- (void)removeVolumeButtons {
-    self.volumeButtonHandler = nil;
 }
 
 - (void) defaultInterface
@@ -214,6 +196,7 @@
         [_cameraButton setImage:[[UIImage imageInBundleNamed:@"flip"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_cameraButton setImage:[[UIImage imageInBundleNamed:@"flip"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
         [_cameraButton setFrame:(CGRect){ 25, 17.5f, kCameraButtonSize, kCameraButtonSize }];
+        [_cameraButton setCenter:(CGPoint){ CGRectGetMidX(_cameraButton.frame), CGRectGetMidY(self.topContainerBar.bounds) }];
         [_cameraButton addTarget:self action:@selector(changeCamera:) forControlEvents:UIControlEventTouchUpInside];
     }
 
@@ -229,6 +212,7 @@
         [_flashButton setImage:[[UIImage imageInBundleNamed:@"flash"] tintImageWithColor:self.tintColor] forState:UIControlStateNormal];
         [_flashButton setImage:[[UIImage imageInBundleNamed:@"flash"] tintImageWithColor:self.selectedTintColor] forState:UIControlStateSelected];
         [_flashButton setFrame:(CGRect){ CGRectGetWidth(self.bounds) - 55, 17.5f, kCameraButtonSize, kCameraButtonSize }];
+        [_flashButton setCenter:(CGPoint){ CGRectGetMidX(_flashButton.frame), CGRectGetMidY(self.topContainerBar.bounds) }];
         [_flashButton setAutoresizingMask:UIViewAutoresizingFlexibleLeftMargin];
         [_flashButton addTarget:self action:@selector(flashTriggerAction:) forControlEvents:UIControlEventTouchUpInside];
     }

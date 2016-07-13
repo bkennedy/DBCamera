@@ -125,13 +125,14 @@ typedef void (^TableRowBlock)();
  
     DBCameraContainerViewController *cameraContainer = [[DBCameraContainerViewController alloc] initWithDelegate:self cameraSettingsBlock:^(DBCameraView *cameraView, DBCameraContainerViewController *container) {
         [cameraView.photoLibraryButton setHidden:NO]; //Hide Library button
-        CGSize size = CGSizeMake(320, 120);
+        CGSize size = CGSizeMake(2.0, 3.0);
         cameraView.previewView.frame =  AVMakeRectWithAspectRatioInsideRect(size, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+        cameraView.previewView.frame = CGRectMake(0, 65, cameraView.previewView.frame.size.width, cameraView.previewView.frame.size.height);
         cameraView.previewLayer.frame = CGRectMake(0, 0, cameraView.previewView.frame.size.width, cameraView.previewView.frame.size.height);
 
 //        CGSize size = CGSizeMake(11.0f, 9.0f);
         container.cameraViewController.forceQuadCrop = YES;
-        cameraView.previewLayer.frame =  AVMakeRectWithAspectRatioInsideRect(size, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
+//        cameraView.previewLayer.frame =  AVMakeRectWithAspectRatioInsideRect(size, [UIScreen mainScreen].bounds); //CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * (9.0f/11.0f));
 //        container.cameraViewController.cameraManager.previewLayer = cameraView.previewLayer;
 //        //Override the camera grid
 //        DBCameraGridView *cameraGridView = [[DBCameraGridView alloc] initWithFrame:cameraView.previewLayer.frame];

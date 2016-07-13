@@ -374,6 +374,8 @@
             NSMutableDictionary *metadata = [ciImage.properties mutableCopy];
 
             if ( !weakSelf.useCameraSegue ) {
+                if ([weakSelf.containerDelegate respondsToSelector:@selector(backFromController:)])
+                    [weakSelf.containerDelegate backFromController:self];
                 if ( [weakSelf.delegate respondsToSelector:@selector(camera:didFinishWithImage:withMetadata:)] )
                     [weakSelf.delegate camera:self didFinishWithImage:image withMetadata:metadata];
             } else {
@@ -388,6 +390,7 @@
                 
                 [weakSelf.navigationController pushViewController:segue animated:YES];
             }
+            
             [weakSelf.loading removeFromSuperview];
         }];
 

@@ -11,6 +11,7 @@
 #import "UIViewController+UIViewController_FullScreen.h"
 #import "DBCameraSegueViewController.h"
 #import "DBCameraView.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @class DBCameraManager;
 @class DBCameraView;
@@ -92,6 +93,8 @@
 @property (nonatomic, strong) NSMutableArray *pinnedViews;
 @property (nonatomic, strong) CMMotionManager *motionManager;
 @property (nonatomic, assign) UIInterfaceOrientation orientationLast, orientationAfterProcess;
-
+@property (nonatomic, assign) CGFloat volume;
+@property (nonatomic, assign) BOOL takenPhoto;
+@property (nonatomic, strong) MPVolumeView *volumeView;
 
 @end

@@ -17,6 +17,7 @@
     const CGAffineTransform t = [UIViewController pinnedViewTansformForOrientation:orientation counter:NO];
     [views enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop) {
         view.transform = t;
+        view.tag = orientation;
     }];
 }
 

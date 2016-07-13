@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "DBCameraDelegate.h"
-#import "JPSVolumeButtonHandler.h"
 
 /**
  *  The view class that contains the UI of the camera. Extend this class if you want to create a custom camera view.
@@ -96,8 +95,6 @@
  */
 @property (nonatomic, strong)   UIPinchGestureRecognizer *pinch;
 
-@property (nonatomic,retain)    JPSVolumeButtonHandler *volumeButtonHandler;
-
 @property (nonatomic,assign)    BOOL panning;
 @property (nonatomic,assign)    UIDeviceOrientation deviceOrientation;
 
@@ -157,7 +154,6 @@
 - (void) pinchCameraViewWithScalNum:(CGFloat)scale;
 - (void) triggerAction:(UIButton *)button;
 
-- (void)setupVolumeButtons;
-- (void)removeVolumeButtons;
+#define kToolFrameHeight 65
 
 @end
